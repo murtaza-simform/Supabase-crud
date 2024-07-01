@@ -13,11 +13,11 @@ import {
   IconButton,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff"
-import { useAuth } from "../../../context/AuthContext";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { supabase } from "../../../client"
 
 const GlassCard = styled(Card)({
   backdropFilter: "blur(10px)",
@@ -30,7 +30,6 @@ const GlassCard = styled(Card)({
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { signIn } = useAuth();
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
   const handleMouseDownPassword = (event) => event.preventDefault();
@@ -50,8 +49,12 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const { data, error } = await signIn({email: formData?.email, password: formData?.password});
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData?.email,
+        password: formData?.password,
+      });
       if (data?.user) {
+        sessionStorage.setItem("token", JSON.stringify(data));
         navigate("/home");
       } else if (error) {
         throw error;
@@ -60,6 +63,15 @@ const Login = () => {
       alert(error?.message);
     }
   };
+
+  useEffect(() => {
+    const session = sessionStorage?.getItem("token");
+    if (session) {
+      navigate("/home", { replace: true });
+    }
+
+    //eslint-disable-next-line
+  }, []);
 
   return (
     <Container

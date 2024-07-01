@@ -2,14 +2,16 @@
 // PrivateRoute.js
 
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../../../context/AuthContext";
 
-const PrivateRoute = async ({ children }) => {
-  const { user } = useAuth();
+const PrivateRoute = ({ children }) => {
+  
+  const sessionData = sessionStorage.getItem('token');
+  let isUser = false;
+  if(sessionData){
+    isUser = true;
+  }
 
-  console.log(user)
-
-  return user ? children : <Navigate to="/login" />;
+  return isUser ? children : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;

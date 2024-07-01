@@ -10,12 +10,11 @@ import {
   IconButton,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-
-import { useAuth } from "../../../context/AuthContext";
+import { supabase } from "../../../client";
 
 const GlassCard = styled(Card)({
   backdropFilter: "blur(10px)",
@@ -29,8 +28,6 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
-  const { signUp } = useAuth();
-
   const handleClickShowPassword = () => setShowPassword(!showPassword);
   const handleMouseDownPassword = (event) => event.preventDefault();
 
@@ -61,27 +58,35 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const { data, error } = await signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData?.email,
         password: formData?.password,
         options: {
           data: {
-            fullName: formData?.fullName
+            fullName: formData?.fullName,
           },
         },
       });
 
-      if(data?.user){
-        alert("Check verification link sent to your mail!")
+      if (data?.user) {
+        alert("Check verification link sent to your mail!");
         navigate("/login");
-      }else if(error){
-        throw error
+      } else if (error) {
+        throw error;
       }
-
     } catch (error) {
-      alert(error?.message)
+      alert(error?.message);
     }
   };
+
+   useEffect(() => {
+     const session = sessionStorage?.getItem("token");
+     if (session) {
+       navigate("/home", { replace: true });
+     }
+
+     //eslint-disable-next-line
+   }, []);
 
   return (
     <Container

@@ -1,41 +1,46 @@
 /* eslint-disable react/prop-types */
-import { Card, CardActions, CardContent, CardHeader, IconButton, Typography } from "@mui/material";
+import { Card, CardActions, CardContent, IconButton, Typography } from "@mui/material";
+import { format } from "date-fns";
 import { BiPencil, BiTrash } from "react-icons/bi";
 
-const Task = ({title, content, dateTime}) => {
+const Task = ({ task, handleEdit, handleDelete}) => {
   return (
     <Card>
-      <CardHeader
-        action={
-          <div>
-            <IconButton aria-label="edit">
-              <BiPencil />
-            </IconButton>
-            <IconButton aria-label="delete">
-              <BiTrash />
-            </IconButton>
-          </div>
-        }
-        title={title}
-        titleTypographyProps={{ fontSize: "16px" }}
-      />
       <CardContent>
         <Typography
           variant="body2"
           component={"p"}
           fontSize={16}
           color="text.secondary"
+          style={{ whiteSpace: "pre-wrap" }}
         >
-          {content}
+          {task?.content}
         </Typography>
       </CardContent>
       <CardActions
         disableSpacing
-        sx={{ justifyContent: "end", marginTop: "20px" }}
+        sx={{
+          justifyContent: "space-between",
+          marginTop: "20px",
+          alignItems: "center",
+          bgcolor: "ghostwhite",
+        }}
       >
-        <Typography variant="caption" color="text.secondary">
-          {dateTime}
+        <Typography
+          variant="caption"
+          component={"small"}
+          color="text.secondary"
+        >
+          {format(task?.created_at, "dd/MM/yyyy hh:mm a")}
         </Typography>
+        <div>
+          <IconButton onClick={(e) => handleEdit(e, task)}  aria-label="edit">
+            <BiPencil size={20} />
+          </IconButton>
+          <IconButton onClick={() => handleDelete(task?.id)} aria-label="delete">
+            <BiTrash size={20} />
+          </IconButton>
+        </div>
       </CardActions>
     </Card>
   );
